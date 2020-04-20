@@ -325,7 +325,7 @@ class WP_REST_Token {
 		}
 
 		$found    = false;
-		$keypairs = get_user_meta( $token->data->user->id, WP_REST_Key_Pair::_USERMETA_KEY_, true );
+		$keypairs = get_user_attribute( $token->data->user->id, WP_REST_Key_Pair::_USERMETA_KEY_ );
 		foreach ( (array) $keypairs as $_key => $item ) {
 			if ( isset( $item['api_key'] ) && $item['api_key'] === $token->data->user->api_key ) {
 				$keypairs[ $_key ]['last_used'] = time();
@@ -348,7 +348,7 @@ class WP_REST_Token {
 				)
 			);
 		} else {
-			update_user_meta( $token->data->user->id, WP_REST_Key_Pair::_USERMETA_KEY_, array_values( $keypairs ) );
+			update_user_attribute( $token->data->user->id, WP_REST_Key_Pair::_USERMETA_KEY_, array_values( $keypairs ) );
 		}
 
 		// Add the api_key to use when encoding the JWT.

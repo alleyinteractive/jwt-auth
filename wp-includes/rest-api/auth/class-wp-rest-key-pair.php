@@ -599,7 +599,7 @@ class WP_REST_Key_Pair {
 	 * @return array
 	 */
 	public function get_user_key_pairs( $user_id ) {
-		$keypairs = get_user_meta( $user_id, self::_USERMETA_KEY_, true );
+		$keypairs = get_user_attribute( $user_id, self::_USERMETA_KEY_ );
 
 		if ( ! is_array( $keypairs ) ) {
 			return array();
@@ -622,12 +622,12 @@ class WP_REST_Key_Pair {
 		if ( is_array( $keypairs ) && ! empty( $keypairs ) ) {
 			foreach ( $keypairs as $keypair ) {
 				if ( isset( $keypair['api_key'] ) && isset( $keypair['api_secret'] ) ) {
-					add_user_meta( $user_id, $keypair['api_key'], $keypair['api_secret'], true );
+					update_user_attribute( $user_id, $keypair['api_key'], $keypair['api_secret'] );
 				}
 			}
 		}
 
-		return update_user_meta( $user_id, self::_USERMETA_KEY_, array_values( $keypairs ) );
+		return update_user_attribute( $user_id, self::_USERMETA_KEY_, array_values( $keypairs ) );
 	}
 
 	/**
