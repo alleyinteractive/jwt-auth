@@ -356,11 +356,14 @@ class WP_REST_Key_Pair {
 
 		$found    = false;
 		$keypairs = $this->get_user_key_pairs( $get_user->ID );
+
+		// Update the "Last IP" which accessed the
+		// keypair. This may not work in some environments due to caching.
 		foreach ( $keypairs as $_key => $item ) {
 			if ( isset( $item['api_key'] ) && $item['api_key'] === $key ) {
 				$keypairs[ $_key ]['last_used'] = time();
 
-				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ) : null;
+				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( $_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP ) : null; // phpcs:ignore WordPressVIPMinimum.Variables.ServerVariables.UserControlledHeaders, WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___SERVER__REMOTE_ADDR__
 				if ( $ip ) {
 					$keypairs[ $_key ]['last_ip'] = $ip;
 				}
@@ -705,6 +708,7 @@ class WP_REST_Key_Pair {
 	 * @since 0.1
 	 */
 	public function template_new_token_key_pair() {
+		// phpcs:disable WordPressVIPMinimum.Security.Mustache.OutputNotation
 		?>
 		<script type="text/html" id="tmpl-new-token-key-pair">
 			<div class="new-key-pair notification-dialog-wrap" data-api_key="{{ data.api_key }}"  data-name="{{ data.name }}">
@@ -761,6 +765,7 @@ class WP_REST_Key_Pair {
 			</div>
 		</script>
 		<?php
+		// phpcs:enable WordPressVIPMinimum.Security.Mustache.OutputNotation
 	}
 
 	/**
