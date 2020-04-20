@@ -16,7 +16,8 @@
     "php-coveralls/php-coveralls": "^2.1",
     "slowprog/composer-copy-file": "0.2.1",
     "wp-coding-standards/wpcs": "*",
-    "xwp/wp-dev-lib": "^1.1.1"
+    "xwp/wp-dev-lib": "^1.1.1",
+    "automattic/vipwpcs": "^2.0"
   },
   "scripts": {
     "phpcs": [

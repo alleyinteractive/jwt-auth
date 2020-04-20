@@ -344,7 +344,7 @@ class WP_REST_Token {
 			if ( isset( $item['api_key'] ) && $item['api_key'] === $token->data->user->api_key ) {
 				$keypairs[ $_key ]['last_used'] = time();
 
-				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ) : null;
+				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ) : null; // phpcs:ignore WordPressVIPMinimum.Variables.ServerVariables.UserControlledHeaders, WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___SERVER__REMOTE_ADDR__
 				if ( $ip ) {
 					$keypairs[ $_key ]['last_ip'] = $ip;
 				}
