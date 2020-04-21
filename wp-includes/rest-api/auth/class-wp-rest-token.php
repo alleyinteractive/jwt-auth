@@ -241,7 +241,21 @@ class WP_REST_Token {
 		// Validate the bearer token.
 		$token = $this->validate_token();
 		if ( is_wp_error( $token ) ) {
-			return $token;
+			/**
+			 * Filter the response when a token is invalid.
+			 *
+			 * By default an authentication error will be returned. This filter
+			 * allows us to modify that response ignoring an invalid token,
+			 * allowing the REST API response to continue, making JWT auth
+			 * optional.
+			 *
+			 * @param object|WP_Error $token  Return the JSON Web Token object,
+			 *                                or WP_Error on failure.
+			 * @param mixed           $result Result of any other
+			 *                                authentication errors.
+			 * @return mixed
+			 */
+			return apply_filters( 'rest_authentication_invalid_token', $token, $result );
 		}
 
 		// If it's a wp_user based token, set the current user.
@@ -330,7 +344,7 @@ class WP_REST_Token {
 			if ( isset( $item['api_key'] ) && $item['api_key'] === $token->data->user->api_key ) {
 				$keypairs[ $_key ]['last_used'] = time();
 
-				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ) : null;
+				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ) : null; // phpcs:ignore WordPressVIPMinimum.Variables.ServerVariables.UserControlledHeaders, WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___SERVER__REMOTE_ADDR__
 				if ( $ip ) {
 					$keypairs[ $_key ]['last_ip'] = $ip;
 				}
@@ -366,8 +380,8 @@ class WP_REST_Token {
 	 */
 	public function require_token() {
 		$require_token  = true;
-		$request_uri    = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( $_SERVER['REQUEST_URI'] ) : false;
-		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( $_SERVER['REQUEST_METHOD'] ) : false;
+		$request_uri    = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : false;
+		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : false;
 
 		// User is already authenticated.
 		$user = wp_get_current_user();
@@ -380,9 +394,15 @@ class WP_REST_Token {
 			$require_token = false;
 		}
 
+		// Don't require a token or Authorization header for preflight OPTIONS
+		// requests.
+		if ( 'OPTIONS' === $request_method ) {
+			$require_token = false;
+		}
+
 		/**
 		 * GET requests do not typically require authentication, but if the
-		 * Authorization header is provided, we will use it. WHat's happening
+		 * Authorization header is provided, we will use it. What's happening
 		 * here is that `WP_REST_Token::get_auth_header` returns the bearer
 		 * token or a `WP_Error`. So if we have an error then we can safely skip
 		 * the GET request.
@@ -755,11 +775,11 @@ class WP_REST_Token {
 	public function get_auth_header() {
 
 		// Get HTTP Authorization Header.
-		$header = isset( $_SERVER['HTTP_AUTHORIZATION'] ) ? sanitize_text_field( $_SERVER['HTTP_AUTHORIZATION'] ) : false;
+		$header = isset( $_SERVER['HTTP_AUTHORIZATION'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_AUTHORIZATION'] ) ) : false;
 
 		// Check for alternative header.
 		if ( ! $header && isset( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) ) {
-			$header = sanitize_text_field( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] );
+			$header = sanitize_text_field( wp_unslash( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) );
 		}
 
 		// The HTTP Authorization Header is missing, return an error.

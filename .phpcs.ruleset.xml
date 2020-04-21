@@ -24,6 +24,12 @@
 			https://github.com/PHPCompatibility/PHPCompatibilityWP -->
 	<rule ref="PHPCompatibilityWP"/>
 
+	<!-- Use the VIP Go ruleset. -->
+	<rule ref="WordPress-VIP-Go" />
+
+	<!-- Use the WordPress.com VIP ruleset. -->
+	<rule ref="WordPressVIPMinimum" />
+
 	<!-- For help in understanding this testVersion:
 		https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions -->
 	<config name="testVersion" value="5.3-"/>
