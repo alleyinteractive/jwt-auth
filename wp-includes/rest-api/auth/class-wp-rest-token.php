@@ -100,7 +100,7 @@ class WP_REST_Token {
 		$args = array(
 			'methods'             => WP_REST_Server::READABLE,
 			'callback'            => array( $this, 'validate' ),
-			'permission_callback' => '__return_true'
+			'permission_callback' => '__return_true',
 		);
 		register_rest_route( self::_NAMESPACE_, '/' . self::_REST_BASE_ . '/validate', $args );
 

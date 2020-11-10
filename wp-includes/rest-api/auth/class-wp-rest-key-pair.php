@@ -520,7 +520,7 @@ class WP_REST_Key_Pair {
 		$keypairs[] = $new_item;
 		$this->set_user_key_pairs( $user_id, $keypairs );
 
-		$new_item['created']   = date( 'F j, Y g:i a', $new_item['created'] );
+		$new_item['created']   = gmdate( 'F j, Y g:i a', $new_item['created'] );
 		$new_item['last_used'] = '—';
 		$new_item['last_ip']   = '—';
 
