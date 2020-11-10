@@ -109,13 +109,13 @@ class WP_REST_Token {
 			'callback'            => array( $this, 'generate_token' ),
 			'permission_callback' => '__return_true',
 			'args'                => array(
-				'api_key'    => array(
+				'api_key'            => array(
 					'description'       => __( 'The API key of the user; requires also setting the api_secret.', 'jwt-auth' ),
 					'type'              => 'string',
 					'sanitize_callback' => 'sanitize_text_field',
 					'validate_callback' => 'rest_validate_request_arg',
 				),
-				'api_secret' => array(
+				'api_secret'         => array(
 					'description'       => __( 'The API secret of the user; requires also setting the api_key.', 'jwt-auth' ),
 					'type'              => 'string',
 					'sanitize_callback' => 'sanitize_text_field',
@@ -346,7 +346,7 @@ class WP_REST_Token {
 			if ( isset( $item['api_key'] ) && $item['api_key'] === $token->data->user->api_key ) {
 				$keypairs[ $_key ]['last_used'] = time();
 
-				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ) : null;
+				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ) : null; // phpcs:ignore WordPressVIPMinimum.Variables.ServerVariables.UserControlledHeaders, WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___SERVER__REMOTE_ADDR__
 				if ( $ip ) {
 					$keypairs[ $_key ]['last_ip'] = $ip;
 				}

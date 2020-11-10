@@ -96,14 +96,14 @@ class WP_REST_Key_Pair {
 			'callback'            => array( $this, 'generate_key_pair' ),
 			'permission_callback' => '__return_true',
 			'args'                => array(
-				'name'    => array(
+				'name'               => array(
 					'description'       => esc_html__( 'The name of the key-pair.', 'jwt-auth' ),
 					'type'              => 'string',
 					'required'          => true,
 					'sanitize_callback' => 'sanitize_text_field',
 					'validate_callback' => 'rest_validate_request_arg',
 				),
-				'user_id' => array(
+				'user_id'            => array(
 					'description'       => esc_html__( 'The ID of the user.', 'jwt-auth' ),
 					'type'              => 'integer',
 					'required'          => true,
@@ -120,7 +120,7 @@ class WP_REST_Key_Pair {
 			'callback'            => array( $this, 'delete_all_key_pairs' ),
 			'permission_callback' => '__return_true',
 			'args'                => array(
-				'user_id' => array(
+				'user_id'            => array(
 					'description'       => esc_html__( 'The ID of the user.', 'jwt-auth' ),
 					'type'              => 'integer',
 					'required'          => true,
@@ -136,14 +136,14 @@ class WP_REST_Key_Pair {
 			'callback'            => array( $this, 'delete_key_pair' ),
 			'permission_callback' => '__return_true',
 			'args'                => array(
-				'user_id' => array(
+				'user_id'            => array(
 					'description'       => esc_html__( 'The ID of the user.', 'jwt-auth' ),
 					'type'              => 'integer',
 					'required'          => true,
 					'sanitize_callback' => 'absint',
 					'validate_callback' => 'rest_validate_request_arg',
 				),
-				'api_key' => array(
+				'api_key'            => array(
 					'description'       => esc_html__( 'The API key being revoked.', 'jwt-auth' ),
 					'type'              => 'string',
 					'required'          => true,
@@ -359,11 +359,14 @@ class WP_REST_Key_Pair {
 
 		$found    = false;
 		$keypairs = $this->get_user_key_pairs( $get_user->ID );
+
+		// Update the "Last IP" which accessed the keypair. This may not work
+		// in some environments due to caching.
 		foreach ( $keypairs as $_key => $item ) {
 			if ( isset( $item['api_key'] ) && $item['api_key'] === $key ) {
 				$keypairs[ $_key ]['last_used'] = time();
 
-				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ) : null;
+				$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? filter_var( wp_unslash( $_SERVER['REMOTE_ADDR'] ), FILTER_VALIDATE_IP ) : null; // phpcs:ignore WordPressVIPMinimum.Variables.ServerVariables.UserControlledHeaders, WordPressVIPMinimum.Variables.RestrictedVariables.cache_constraints___SERVER__REMOTE_ADDR__
 				if ( $ip ) {
 					$keypairs[ $_key ]['last_ip'] = $ip;
 				}
@@ -708,6 +711,7 @@ class WP_REST_Key_Pair {
 	 * @since 0.1
 	 */
 	public function template_new_token_key_pair() {
+		// phpcs:disable WordPressVIPMinimum.Security.Mustache.OutputNotation
 		?>
 		<script type="text/html" id="tmpl-new-token-key-pair">
 			<div class="new-key-pair notification-dialog-wrap" data-api_key="{{ data.api_key }}"  data-name="{{ data.name }}">
@@ -764,6 +768,7 @@ class WP_REST_Key_Pair {
 			</div>
 		</script>
 		<?php
+		// phpcs:enable WordPressVIPMinimum.Security.Mustache.OutputNotation
 	}
 
 	/**
